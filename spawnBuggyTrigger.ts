@@ -81,7 +81,7 @@ export class TriggerLogic extends Component<typeof TriggerLogic> {
       // Set the gizmo text to indicate despawning is in progress
       const textGizmo = this.props.despawnTextGizmo?.as(TextGizmo);
       if (textGizmo) {
-        textGizmo.text.set("Despawnning Buggy");
+        textGizmo.text.set("Despawning Buggy");
       }
 
       console.log(`Sending despawn request for player ${playerId}`);
