@@ -288,6 +288,13 @@ export class SpawnUI extends UIComponent<typeof SpawnUI> {
      */
     private async handleSpawnRequest(player: Player, buggy: Asset | null | undefined, buggyLocation: Entity | null | undefined) {
         try {
+            // One-buggy-per-player gate: if this player already has active spawned entities, block new spawn
+            const existing = this.spawnedEntities.get(player.id);
+            if (existing && existing.length > 0) {
+                this.errorMessageBinding.set("You already have a buggy active. Please return or despawn it before spawning another.");
+                return;
+            }
+
             if (!buggy) {
                 console.error("No asset configured for spawning");
                 this.errorMessageBinding.set("Error: No Asset Configured");
