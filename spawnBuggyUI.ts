@@ -187,6 +187,7 @@ export class SpawnUI extends UIComponent<typeof SpawnUI> {
             } catch (error) {
                 console.error("Error processing despawn request:", error);
             }
+        });
 
         // === Despawn a single buggy by groupId (e.g., from a tagged object despawn zone) ===
         this.connectNetworkBroadcastEvent(requestDespawnGroupEvent, async (data: { groupId: string }) => {
@@ -255,7 +256,6 @@ export class SpawnUI extends UIComponent<typeof SpawnUI> {
             } catch (err) {
                 this.sendNetworkBroadcastEvent(despawnByKeyResultEvent, { key: `entity:${String(entityId)}`, count: 0, failedCount: 1 });
             }
-        });
         });
     }
 
