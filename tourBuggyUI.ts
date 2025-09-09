@@ -66,14 +66,16 @@ class TourBuggyUI extends ui.UIComponent<typeof TourBuggyUI> {
     // Send event to specific buggy entity if wired, otherwise broadcast globally
     const targetBuggy = this.props.buggy;
     if (targetBuggy) {
-      this.sendLocalBroadcastEvent(TourControlEvent, { 
+      this.sendLocalBroadcastEvent(TourControlEvent, {
         action: newVal ? 'start' : 'stop',
+        pause: !newVal,
         targetEntityId: targetBuggy.id
       });
       console.log('TourBuggyUI: Toggled ->', newVal ? 'start' : 'stop', 'for buggy:', targetBuggy.name);
     } else {
-      this.sendLocalBroadcastEvent(TourControlEvent, { 
-        action: newVal ? 'start' : 'stop'
+      this.sendLocalBroadcastEvent(TourControlEvent, {
+        action: newVal ? 'start' : 'stop',
+        pause: !newVal
       });
       console.log('TourBuggyUI: Toggled ->', newVal ? 'start' : 'stop', '(broadcast to all)');
     }

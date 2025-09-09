@@ -14,6 +14,9 @@ class TourBuggy extends hz.Component<typeof TourBuggy> {
     axis: { type: hz.PropTypes.String, default: 'z' },
   };
 
+  private paused: boolean = false;
+
+
   private target!: hz.Entity;
   private running = false; // start OFF until UI starts the tour
   private kinematicVel: hz.Vec3 = new hz.Vec3(0, 0, 0);
@@ -27,12 +30,21 @@ class TourBuggy extends hz.Component<typeof TourBuggy> {
     this.target = this.props.moveEntity ?? this.entity;
 
     // Listen for UI start/stop events - respond only if targeted to this entity or broadcast to all
-    this.connectLocalBroadcastEvent(TourControlEvent, ({ action, targetEntityId }) => {
+    this.connectLocalBroadcastEvent(TourControlEvent, ({ action, pause, targetEntityId }) => {
       // If targetEntityId is specified, only respond if it matches this entity
       if (targetEntityId && targetEntityId !== this.entity.id) return;
       
-      if (action === 'start') this.startMotion();
-      else this.stopMotion();
+      if (action === 'start') { this.startMotion(); return; }
+      // action === 'stop'
+      if (pause) {
+        // UI pause-in-place: stop updates, keep transform
+        this.paused = true;
+        this.running = false;
+        this.kinematicVel = new hz.Vec3(0,0,0);
+      } else {
+        // Hard reset (guidance/physical triggers)
+        this.stopMotion();
+      }
     });
 
     // Subscribe to all triggers tagged with the stop tag
@@ -70,11 +82,13 @@ class TourBuggy extends hz.Component<typeof TourBuggy> {
       this.initialRotation = this.target.rotation.get().clone();
     }
     this.running = true;
+    this.paused = false;
   }
 
   private stopMotion() {
     this.running = false;
     this.kinematicVel = new hz.Vec3(0, 0, 0);
+    this.paused = false;
     
     // Reset to initial transform if available
     if (this.initialPosition && this.initialRotation) {
@@ -146,7 +160,7 @@ class TourBuggy extends hz.Component<typeof TourBuggy> {
   }
 
   private onUpdate(dt: number) {
-    if (!this.running) return;
+    if (!this.running) return; if (this.paused) return;
     const forward = this.moveVector();
     const spd = this.props.speed ?? 3;
     // Always kinematic translate with a fixed smoothing to avoid choppy motion
