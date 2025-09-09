@@ -1,6 +1,6 @@
 import { UIComponent, View, Text, Pressable, Binding, UINode } from 'horizon/ui';
 import { Player, PropTypes, Asset, Vec3, Quaternion, Entity, HapticStrength, HapticSharpness } from 'horizon/core';
-import { requestDespawnEvent, despawnResultEvent } from './spawnBuggyEvents';
+import { requestDespawnEvent, despawnResultEvent, requestDespawnGroupEvent, requestDespawnByEntityEvent, despawnByKeyResultEvent } from './spawnBuggyEvents';
 
 /**
  * SpawnUI Component
@@ -43,6 +43,52 @@ export class SpawnUI extends UIComponent<typeof SpawnUI> {
      * @private
      */
     private spawnedEntities: Map<number, Entity[]> = new Map();
+    /**
+     * Track groups of spawned assets by a generated groupId so we can despawn
+     * exactly one buggy even if its player is not present.
+     */
+    private groupEntities: Map<string, Entity[]> = new Map();
+    private entityToGroup: Map<bigint, string> = new Map();
+
+    /**
+     * Tag to apply to spawned buggy entities so object-tag triggers can detect them.
+     * Keep <=20 chars per tag (Horizon limit).
+     */
+    private buggyTag = 'buggy';
+
+    /** Create a short group id (<=12 chars) suitable for tags like "gid:<id>" */
+    private generateGroupId(): string {
+        const n = Math.floor(Math.random() * 0xFFFFFFFF);
+        return n.toString(36); // short base36 id
+    }
+
+    /** Attach runtime gameplay tags to each entity in a group */
+    private tagSpawnGroup(entities: Entity[], gid: string) {
+        for (const e of entities) {
+            try {
+                e.tags.add(this.buggyTag);
+                const gidTag = `gid:${gid}`;
+                // ensure tag <= 20 chars
+                const safeTag = gidTag.length > 20 ? gidTag.slice(0, 20) : gidTag;
+                e.tags.add(safeTag);
+            } catch (err) {
+                console.error('Failed to tag entity for group', gid, String(err));
+            }
+        }
+    }
+
+    /** Resolve a groupId from an entity's tags (fallback if local map is missing) */
+    private groupIdFromEntityTags(entity: Entity): string | null {
+        try {
+            for (const t of entity.tags.get()) {
+                if (t.startsWith('gid:')) {
+                    return t.slice(4);
+                }
+            }
+        } catch {}
+        return null;
+    }
+
 
     /** 
      * Height of the UI panel in pixels
@@ -141,6 +187,75 @@ export class SpawnUI extends UIComponent<typeof SpawnUI> {
             } catch (error) {
                 console.error("Error processing despawn request:", error);
             }
+
+        // === Despawn a single buggy by groupId (e.g., from a tagged object despawn zone) ===
+        this.connectNetworkBroadcastEvent(requestDespawnGroupEvent, async (data: { groupId: string }) => {
+            const { groupId } = data;
+            const entities = this.groupEntities.get(groupId) ?? [];
+            let success = 0;
+            const failed: Entity[] = [];
+            // Remove group from indexes first to avoid duplicate work
+            this.groupEntities.delete(groupId);
+            for (const e of entities) { this.entityToGroup.delete(e.id); }
+
+            for (const entity of entities) {
+                try {
+                    await this.world.deleteAsset(entity);
+                    success++;
+                } catch (err) {
+                    failed.push(entity);
+                }
+            }
+
+            // Clean player-owned list: remove any entities we actually deleted
+            this.spawnedEntities.forEach((list, pid) => {
+                const remaining = list.filter(e => !entities.includes(e));
+                if (remaining.length !== list.length) {
+                    this.spawnedEntities.set(pid, remaining);
+                }
+            });
+
+            this.sendNetworkBroadcastEvent(despawnByKeyResultEvent, {
+                key: `group:${groupId}`,
+                count: success,
+                failedCount: failed.length
+            });
+        });
+
+        // === Despawn by a specific entity ID (resolve its group, if any) ===
+        this.connectNetworkBroadcastEvent(requestDespawnByEntityEvent, async (data: { entityId: bigint }) => {
+            // First try local index
+            const { entityId } = data;
+            let gid = this.entityToGroup.get(entityId) || null;
+
+            // Best-effort: if the entity still exists and has tags, read gid from tags
+            if (!gid) {
+                try {
+                    const maybe = new Entity(entityId);
+                    gid = this.groupIdFromEntityTags(maybe);
+                } catch {}
+            }
+
+            if (gid) {
+                // Delegate to the grouped logic
+                this.sendNetworkBroadcastEvent(requestDespawnGroupEvent, { groupId: gid });
+                return;
+            }
+
+            // No group found -> try to delete the single entity
+            try {
+                const entity = new Entity(entityId);
+                await this.world.deleteAsset(entity);
+
+                // Remove from any tracking lists
+                this.spawnedEntities.forEach((list, pid) => {
+                    this.spawnedEntities.set(pid, list.filter(e => e.id !== entityId));
+                });
+                this.sendNetworkBroadcastEvent(despawnByKeyResultEvent, { key: `entity:${String(entityId)}`, count: 1, failedCount: 0 });
+            } catch (err) {
+                this.sendNetworkBroadcastEvent(despawnByKeyResultEvent, { key: `entity:${String(entityId)}`, count: 0, failedCount: 1 });
+            }
+        });
         });
     }
 
@@ -213,7 +328,15 @@ export class SpawnUI extends UIComponent<typeof SpawnUI> {
                 entity.visible.set(true);
             }
 
-            // Track the spawned entities for this player
+            
+            // Tag the spawned entities and record them as a group so object-tag triggers can despawn a single buggy
+            const groupId = this.generateGroupId();
+            this.tagSpawnGroup(entities, groupId);
+            this.groupEntities.set(groupId, entities);
+            for (const e of entities) {
+                this.entityToGroup.set(e.id, groupId);
+            }
+// Track the spawned entities for this player
             const playerId = player.id;
             if (!this.spawnedEntities.has(playerId)) {
                 this.spawnedEntities.set(playerId, []);
