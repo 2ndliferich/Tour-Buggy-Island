@@ -1,3 +1,14 @@
+/**
+ * @file Easy Tour Buggy System — Network Events (spawn/despawn lifecycle)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * Network events used by the Spawn UI and Trigger Logic:
+ * - `requestDespawnEvent { playerId }`
+ * - `despawnResultEvent { playerId, count, failedCount }`
+ */
+
 import { NetworkEvent } from 'horizon/core';
 
 /**

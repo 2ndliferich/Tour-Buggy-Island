@@ -1,3 +1,26 @@
+/**
+ * @file Easy Tour Buggy System — Buggy Controller (movement/loop reset/stop tags)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * Attach to the buggy root (or a parent). Drives smooth kinematic motion along
+ * a configurable axis and reacts to local events:
+ *  - `TourControlEvent { action: 'start'|'stop', targetEntityId? }`
+ *  - `TourPathEvent { travelAxis, faceAxis?, stop?, targetEntityId? }`
+ *
+ * @props
+ * - `moveEntity: Entity` (optional)  Entity to move; defaults to this.entity
+ * - `speed: number` (default 3)      Units per second
+ * - `stopTriggerTag: string` (default "stop")  Any trigger with this tag halts the buggy
+ * - `axis: string` (default "z")     Local travel axis when no path events are active
+ *
+ * @usage
+ * 1) Add to buggy root.
+ * 2) Optionally set `moveEntity` to a mesh child if the script sits on a container.
+ * 3) Use `tourBuggyUI.ts` or `tourBuggyGuidance.ts` to send control/path events.
+ */
+
 import * as hz from 'horizon/core';
 import { TourControlEvent, TourPathEvent } from './tourBuggyEvents';
 

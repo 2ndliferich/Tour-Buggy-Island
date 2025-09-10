@@ -1,3 +1,23 @@
+/**
+ * @file Crown Falls Fountain — World-space Center Spin (ambient water illusion)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * Rotates each stream around its *world-space center* so UVs appear to flow.
+ * Per-stream speed and reverse, with axis selection ('x' | 'y' | 'z').
+ * Optional ambient audio source.
+ *
+ * @props
+ * - `waterStream1: Entity` / `waterStream1_speed: number` / `waterStream1_reverse: boolean`
+ * - `waterStream:  Entity` / `waterStream_speed:  number` / `waterStream_reverse:  boolean`
+ *   (If your script has additional streams, repeat the same naming pattern.)
+ *
+ * @usage
+ * 1) Attach to a controller entity; assign each stream (mesh or group) and speeds.
+ * 2) Choose axis per stream; use small speeds (e.g., 0.3–1.0) for a subtle flow effect.
+ */
+
 import * as hz from 'horizon/core';
 
 /**

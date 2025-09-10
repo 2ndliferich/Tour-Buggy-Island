@@ -1,3 +1,22 @@
+/**
+ * @file Easy Tour Buggy System — Start/Stop UI (player-facing toggle panel)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * A simple UI switch to start/stop a specific buggy or broadcast to all.
+ * Emits `TourControlEvent` with an optional `targetEntityId`.
+ *
+ * @props
+ * - `startRunning: boolean` (default false)  Initialize as running
+ * - `startLabel: string` (default "Start Buggy")
+ * - `stopLabel: string`  (default "Stop Buggy")
+ * - `buggy: Entity` (optional)               Target buggy; if empty, broadcasts
+ *
+ * @usage
+ * Attach to a Custom UI Gizmo; wire labels and (optionally) the target buggy.
+ */
+
 import * as hz from 'horizon/core';
 import * as ui from 'horizon/ui';
 import { TourControlEvent } from './tourBuggyEvents';

@@ -1,3 +1,21 @@
+/**
+ * @file Easy Tour Buggy System — Despawn Trigger (return/garage zone handler)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * Place on a Trigger Gizmo in your “return” area. On player enter, sends a network
+ * `requestDespawnEvent { playerId }` to the Spawn UI and listens for `despawnResultEvent`
+ * to update optional TextGizmo feedback.
+ *
+ * @props
+ * - `spawnUI: Entity` (required)   Reference to the entity running `spawnBuggyUI.ts`
+ * - `despawnTextGizmo: Entity`     Optional TextGizmo for status messages
+ *
+ * @notes
+ * Also resets the TextGizmo when the player exits and on component disposal.
+ */
+
 import { Component, PropTypes, Player, TextGizmo, CodeBlockEvents } from 'horizon/core';
 import { requestDespawnEvent, despawnResultEvent } from './spawnBuggyEvents';
 

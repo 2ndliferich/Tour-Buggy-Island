@@ -1,3 +1,18 @@
+/**
+ * @file Easy Tour Buggy System — Respawn Trigger (teleport to SpawnPointGizmo)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * Teleports entering players to a designated `SpawnPointGizmo`.
+ *
+ * @props
+ * - `respawnPoint: Entity` (required)  A `SpawnPointGizmo` to send players to
+ *
+ * @usage
+ * Attach to a Trigger Gizmo placed anywhere you want players to be returned to spawn.
+ */
+
 import { Component, PropTypes, CodeBlockEvents, SpawnPointGizmo } from 'horizon/core';
 
 class RespawnTrigger extends Component<typeof RespawnTrigger> {

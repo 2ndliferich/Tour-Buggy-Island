@@ -1,3 +1,23 @@
+/**
+ * @file Easy Tour Buggy System — Spawn UI (1/2/4-seat buggy spawner, per-player tracking)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * VR-friendly panel that spawns buggy assets, remembers each player’s spawned entities,
+ * and handles networked despawn responses. Provides basic haptics and visual feedback.
+ *
+ * @props (assets & optional spawn locations)
+ * - `buggySinglePlayer: Asset`                | `buggyLocationSinglePlayer: Entity`
+ * - `buggyTwoPlayer: Asset`                   | `buggyLocationTwoPlayer: Entity`
+ * - `buggyFourPlayer: Asset`                  | `buggyLocationFourPlayer: Entity`
+ *
+ * @usage
+ * 1) Attach to a Custom UI Gizmo.
+ * 2) Wire one or more asset+location pairs (location optional; will spawn near the player).
+ * 3) Pair with `spawnBuggyTrigger.ts` for clean returns.
+ */
+
 import { UIComponent, View, Text, Pressable, Binding, UINode } from 'horizon/ui';
 import { Player, PropTypes, Asset, Vec3, Quaternion, Entity, HapticStrength, HapticSharpness } from 'horizon/core';
 import { requestDespawnEvent, despawnResultEvent, requestDespawnGroupEvent, requestDespawnByEntityEvent, despawnByKeyResultEvent } from './spawnBuggyEvents';

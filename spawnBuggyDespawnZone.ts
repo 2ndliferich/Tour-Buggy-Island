@@ -1,3 +1,15 @@
+/**
+ * @file Easy Tour Buggy System — Local Events
+ * @author 2ndLife Rich — HumAi LLC
+ * @copyright © 2025 HumAi LLC
+ * @license MIT
+ * @remarks
+ * Shared local events so components can communicate without direct references.
+ * - `TourControlEvent`: start/stop a buggy (optionally target a specific entityId)
+ * - `TourPathEvent`: set travel axis and optional facing; can also request a stop
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 import { Component, PropTypes, Entity, TextGizmo, CodeBlockEvents } from 'horizon/core';
 import { requestDespawnByEntityEvent, requestDespawnGroupEvent } from './spawnBuggyEvents';

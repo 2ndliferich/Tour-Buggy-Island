@@ -1,3 +1,23 @@
+/**
+ * @file Easy Tour Buggy System — Guidance Trigger (path/stop sender)
+ * @author 2ndLife Rich — HumAi LLC
+ * © 2025 HumAi LLC — MIT License. SPDX-License-Identifier: MIT
+ *
+ * @overview
+ * Attach to a Trigger Gizmo placed along the route. On enter it either:
+ *  - Sends `TourControlEvent { action: 'stop' }` if `stop=true`
+ *  - Sends `TourPathEvent { travelAxis, faceAxis? }` for directional guidance
+ * Supports both OnEntityEnterTrigger and OnPlayerEnterTrigger.
+ *
+ * @props
+ * - `stop: boolean` (default false)
+ * - `travelAxis: string` world-space direction to travel, e.g. "x", "-z", "0,1,0"
+ * - `faceAxis?: string` optional world-space facing, defaults to `travelAxis`
+ *
+ * @tips
+ * Place triggers slightly before a turn; use shorter spacing for tighter curves.
+ */
+
 import * as hz from 'horizon/core';
 import { TourControlEvent, TourPathEvent } from './tourBuggyEvents';
 
