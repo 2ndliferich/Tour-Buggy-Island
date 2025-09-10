@@ -160,16 +160,6 @@ A drop‑in **tour buggy + outdoor gallery** system for Horizon Worlds. World cr
 
 ---
 
-## Submission‑ready descriptions
-
-**Short (≤150 chars)**
-A drop‑in hover‑buggy tour and outdoor gallery system for Horizon Worlds—spawn, start/stop, and guide routes with simple triggers.
-
-**Long (≈500 chars)**
-Coastline Canvas Tour is a creator‑friendly hover‑buggy system for Horizon Worlds. Spawn 1/2/4‑seat buggies, start/stop rides with a single UI tap, and guide the route using placeable Guidance Triggers—no scripting required. Perfect for island galleries and scenic loops, it supports stop zones by tag or flag, per‑buggy or broadcast control, and clean local/network events. Includes utilities for despawn, respawn, and an optional Crown Falls fountain effect. Built by HumAi LLC (LuxeVR Club).
-
----
-
 ## Credit / Licensing
 
 **Credit requirement**: If you use this system (in part or whole), add a visible credit in your world description or an in‑world sign/panel:
